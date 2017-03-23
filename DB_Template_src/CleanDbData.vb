@@ -1,5 +1,6 @@
 'Author: Drew'
-'Date: 3/21/2017'
+'Date: 3/23/2017'
+'Version: 1.1'
 'Description: Script to clean up data gathered by All_qa.txt files for DSN.'
 
 
@@ -8,11 +9,14 @@ Option Compare Database
 Private Sub btnRunQuery_Click()
 On Error GoTo Err_btnRunQuery_Click
     'Initialize all variables, record time started.'
-    Dim runTime as Single, startTime as Single: startTime = Timer()
+    Dim runTime As Single, startTime As Single: startTime = Timer()
     Dim in_trans As Boolean
     Dim cn As ADODB.Connection
     Dim i As Integer
     Dim sSQL(7) As String
+    
+    'Rename ImportError to match how it's named in sSQL(0): All_qa_ImportErrors
+    RenameImportErrorTable
     
     'Define what to delete, based on recommendations.'
     sSQL(0) = "DELETE All_qa.* FROM All_qa WHERE (All_qa.ID in (Select All_qa_ImportErrors.Row from All_qa_ImportErrors))"
@@ -41,39 +45,56 @@ On Error GoTo Err_btnRunQuery_Click
             'runTime = Timer()
             cn.Execute sSQL(i), , adExecuteNoRecords
             'runTime = Timer() - runTime
-            'MsgBox Cstr(i) + ": " + Cstr(runTime) + " seconds." 
+            'MsgBox Cstr(i) + ": " + Cstr(runTime) + " seconds."
         Next i
     'Commit transactions.'
     DBEngine.CommitTrans
 
-    'Unset bool transaction flag, close and erase ADO connection, delete ImportErrors.'
+    'Unset bool transaction flag, close and erase ADO connection '
     in_trans = False
     cn.Close
-    Set cn = nothing
-    runTime = Timer() - startTime
+    Set cn = Nothing
+    
+    'Delete ImportErrors'
     DeleteImportErrorTables
 
-    'Display Confirmation, Exit Subroutine'
-    MsgBox "Completed in: " + CStr(runTime) + " seconds."
-    Exit Sub
+    'Record Runtime, Display Confirmation
+    runTime = Timer() - startTime
+    MsgBox "Completed in: " + CStr(runTime) + " seconds." + VbCrLf + "Don't forget to Compact and Repair!" _
+            + VbCrLf + "Database Tools -> Compact and Repair Database"
 
 'If Error, try to rollback partial executions, erase ADO connection, display Error.'
 Err_btnRunQuery_Click:
-    If in_trans = True Then
-        DBEngine.Rollback
+    If err.Number <> 0 Then
+        If in_trans = True Then
+            DBEngine.Rollback
+        End If
+        Set cn = Nothing
+        MsgBox "Error " + Err.Description
+        Exit Sub
     End If
-    Set cn = nothing
-    MsgBox "Error " + Err.Description
-    Exit Sub
 End Sub
 
 'Function to delete ImportErrors.'
+'http://datapigtechnologies.com/blog/index.php/clearing-access-importerror-tables/'
 Sub DeleteImportErrorTables()
     Dim iTable As DAO.TableDef
      
     For Each iTable In CurrentDb.TableDefs
         If iTable.Name Like "*ImportErrors*" Then
             CurrentDb.TableDefs.Delete iTable.Name
+        End If
+    Next iTable
+End Sub
+
+'Function to rename ImportError table for SQL querying.'
+Sub RenameImportErrorTable()
+    Dim iTable As DAO.TableDef
+     
+    For Each iTable In CurrentDb.TableDefs
+        If iTable.Name Like "*ImportErrors*" Then
+           iTable.Name = "All_qa_ImportErrors"
+           Exit Sub
         End If
     Next iTable
 End Sub
