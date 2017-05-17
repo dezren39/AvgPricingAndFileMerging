@@ -1,8 +1,8 @@
 'This module contains the sub to prepare an array _
-for runAllProds, execute runAllProds, and clean-up the data _
-that was generated for review. This module also contains the _
-sub runAllProds, which executes EDIT_ACCESS_QUERY from _
-TRF_PricingLogic against each element in the array.
+'for runAllProds, execute runAllProds, and clean-up the data _
+'that was generated for review. This module also contains the _
+'sub runAllProds, which executes EDIT_ACCESS_QUERY from _
+'TRF_PricingLogic against each element in the array.
 
 Sub Show_DB_Form()
     dbSelect.Show
@@ -128,4 +128,3 @@ Err1:
     MsgBox "The following error occurred: " & Err.Description
     Resume Done
 End Sub
-
