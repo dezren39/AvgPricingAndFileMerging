@@ -5,26 +5,31 @@ REM Description:	This file recursively searches for all instances of 'all_qa.txt
 REM 				within a chosen input directory, then aggregates and outputs 
 REM					them to a chosen output directory as a single text file.
 REM Author:			Drewry Pope
-REM Date:			09/12/2016
-REM Version:		1.0.0.1
+REM Date:			04/14/2017
+REM Version:		1.0.0.2 (Last rev 1.0.0.1, 9/12/2016)
+REM Changes:        Added code after get input to allow import of all_qa
+REM                 that is located in the root of the input folder.
 
 setlocal enabledelayedexpansion
 set INPUT=%CD%
 set OUTPUT=%CD%
+
 :start
 set END="Y"
 if exist "all_qa_dirpath.txt" erase "all_qa_dirpath.txt"
 if exist "all_qa_filepath.txt" erase "all_qa_filepath.txt"
 echo What is the file path you want to search within? (Input Directory)
 echo Current Default^: %INPUT%
-echo Don't include / at end.
+echo Don't include \ at end.
 set /p INPUT=""
-dir "%INPUT%" /s /b /ad > all_qa_dirpath.txt
+echo %INPUT%\>all_qa_dirpath.txt
+dir "%INPUT%\" /s /b /ad >> all_qa_dirpath.txt
 echo. 2>all_qa_filepath.txt
 for /f "delims=" %%i in (all_qa_dirpath.txt) do (
 if exist "%%i\all_qa.txt" (echo "%%i\all_qa.txt" >> all_qa_filepath.txt)
 )
 for /f %%a in ('type "all_qa_filepath.txt" ^| find "" /v /c') do set /a COUNT=%%a
+
 :redo
 echo,
 echo We found %COUNT% all_qa.txt files in that directory.
@@ -51,6 +56,7 @@ echo Aggregating...
 for /f "delims=" %%i in (all_qa_filepath.txt) do type %%i >>"%OUTPUT%\all_qa_aggregated_%date:~4,2%%date:~7,2%%date:~-2,2%.txt"
 echo Operation Completed.
 echo,
+
 :skip
 if exist "all_qa_dirpath.txt" erase "all_qa_dirpath.txt"
 if exist "all_qa_filepath.txt" erase "all_qa_filepath.txt"
