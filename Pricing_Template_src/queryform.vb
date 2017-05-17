@@ -1,5 +1,5 @@
 'This form contains the text boxes and triggers to manually _
-run a single product for pricing.
+'run a single product for pricing.
 
 Private Sub get_data_btn_Click()
 On Error GoTo Err1
