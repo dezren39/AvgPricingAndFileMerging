@@ -1,5 +1,5 @@
 '*********************************************************************
-'This program was created by Edward Woodford, amendments by Drewry Pop after 03/2017
+'This program was created by Edward Woodford, amendments by Drewry Pope after 03/2017
 '*********************************************************************
 'This module contains the main logic which is ran against each item entered _
    'by either the single form or through runAllProds called by the dbSelect form.
