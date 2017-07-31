@@ -13,7 +13,7 @@ REM                 that is located in the root of the input folder.
 setlocal enabledelayedexpansion
 set INPUT=%CD%
 set OUTPUT=%CD%
-
+goto skip
 :start
 set END="Y"
 if exist "all_qa_dirpath.txt" erase "all_qa_dirpath.txt"
@@ -60,15 +60,16 @@ echo,
 :skip
 if exist "all_qa_dirpath.txt" erase "all_qa_dirpath.txt"
 if exist "all_qa_filepath.txt" erase "all_qa_filepath.txt"
-echo E to Soft Exit. (if started from prompt)
-echo R to Restart.
-echo S to Split File.
-echo Press Enter to Close Window. 
+echo Type one of the following letters, then press Enter
+echo A - Aggregate Files.
+echo S - Split File.
+echo X - Soft Exit. (if started from prompt)
+echo Press Enter by itself to Close Window. 
 set /p END=""
-if "%END%"=="r" goto start
-if "%END%"=="R" goto start
-if "%END%"=="e" exit /b
-if "%END%"=="E" exit /b
+if "%END%"=="a" goto start
+if "%END%"=="A" goto start
+if "%END%"=="x" exit /b
+if "%END%"=="X" exit /b
 if "%END%"=="s" goto split
 if "%END%"=="S" goto split
 exit
@@ -101,7 +102,7 @@ set /p SPLIT_SIZE=""
             'Reading ' + $upperBound;  ^
             $count = $fromFile.Read($buff, 0, $buff.Length);  ^
             if ($count -gt 0) {  ^
-                $to = '{0}.{1}.{2}' -f ($rootName, $idx, $ext);  ^
+                $to = '{0}_{1}.{2}' -f ($rootName, $idx, $ext);  ^
                 $toFile = [io.file]::OpenWrite($to);  ^
                 try {  ^
                     'Writing ' + $count + ' to ' + $to;  ^
